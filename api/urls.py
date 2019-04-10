@@ -1,7 +1,8 @@
 from django.urls import path, include
-from . import gdbConn
+from . import gdbContr
 
 urlpatterns = [
-    path('start', gdbConn.start),
-    path('continue', gdbConn.continu),
+    path('uploadelf', gdbContr.uploadelf),
+    path('start', gdbContr.start),
+    path('continue', gdbContr.continu),
 ]
