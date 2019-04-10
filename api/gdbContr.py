@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from pygdbmi.gdbcontroller import GdbController, NoGdbProcessError
 
-ret = {}
+# ret = {}
 
 def uploadelf(request):
     print('============uploadelf================')
@@ -9,9 +9,14 @@ def uploadelf(request):
     if not fileName:
         fileName = 'demo'
     gdbmi = GdbController()
-    ret['code'] = 0
-    ret['message'] = gdbmi.write('file '+fileName)
-    request.session['GdbController'] = gdbmi
+    resp = gdbmi.write('file '+fileName)
+    print(resp)
+    # request.session['GdbController'] = gdbmi
+    ret = {
+        'code': 0,
+        'message': resp,
+    }
+    print('ret------------'+str(ret))
     return JsonResponse(ret)
 
 def start(request):
