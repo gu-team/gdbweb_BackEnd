@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from pygdbmi.gdbcontroller import GdbController, NoGdbProcessError
 
-# ret = {}
+gdbmis = {}
 
 def uploadelf(request):
     print('============uploadelf================')
@@ -11,32 +11,47 @@ def uploadelf(request):
     gdbmi = GdbController()
     resp = gdbmi.write('file '+fileName)
     print(resp)
-    # request.session['GdbController'] = gdbmi
+    request.session['id'] = '1'
+    gdbmis[request.session['id']] = gdbmi
     ret = {
         'code': 0,
         'message': resp,
     }
-    print('ret------------'+str(ret))
+    print('ret------------> '+str(ret))
     return JsonResponse(ret)
+
 
 def start(request):
     print('==============start==================')
-    gdbmi = request.session.get('GdbController')
-    try:
-        ret['message'] = gdbmi.write('start')
-        ret['code'] = 0
-    except NoGdbProcessError:
+    gdbmiId = request.session.get('id', -1)
+    ret = {}
+    if gdbmiId == -1:
         ret['code'] = 1
-        ret['message'] = 'no gdb process'
+        ret['message'] = 'no gdbmi in session'
+    else:
+        gdbmi = gdbmis[gdbmiId]
+        try:
+            ret['message'] = gdbmi.write('start')
+            ret['code'] = 0
+        except NoGdbProcessError:
+            ret['code'] = 1
+            ret['message'] = 'no gdb process'
     return JsonResponse(ret)
+
 
 def continu(request):
     print('==============continu==================')
-    gdbmi = request.session.get('GdbController')
-    try:
-        ret['message'] = gdbmi.write('continue')
-        ret['code'] = 0
-    except NoGdbProcessError:
+    gdbmiId = request.session.get('id', -1)
+    ret = {}
+    if gdbmiId == -1:
         ret['code'] = 1
-        ret['message'] = 'no gdb process'
+        ret['message'] = 'no gdbmi in session'
+    else:
+        gdbmi = gdbmis[gdbmiId]
+        try:
+            ret['message'] = gdbmi.write('continue')
+            ret['code'] = 0
+        except NoGdbProcessError:
+            ret['code'] = 1
+            ret['message'] = 'no gdb process'
     return JsonResponse(ret)
