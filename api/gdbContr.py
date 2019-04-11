@@ -5,53 +5,67 @@ gdbmis = {}
 
 def uploadelf(request):
     print('============uploadelf================')
-    fileName = request.GET.get('fileName')
+    ret = {}
+    fileName = request.GET.get('fileName')      # 从请求获取文件名参数
     if not fileName:
         fileName = 'demo'
-    gdbmi = GdbController()
-    resp = gdbmi.write('file '+fileName)
-    print(resp)
-    request.session['id'] = '1'
-    gdbmis[request.session['id']] = gdbmi
-    ret = {
-        'code': 0,
-        'message': resp,
-    }
+    gdbmi = GdbController()                     # 为当前用户实例化GdbController对象
+    # if gdbmi == None ???
+
+    gdbmis[request.session['pid']] = gdbmi          # 当前用户的gdbmi的pid作为 gdbmis 的key
+    request.session['pid'] = gdbmi.gdb_process.pid  # 将pid放到当前用户的session中
+    
+    resp = gdbmi.write('file '+fileName)        # 加载调试文件，此时gdb还没有子进程，不需要抛出异常
+    ret['code'] = 0
+    ret['message']: resp
+
     print('ret------------> '+str(ret))
     return JsonResponse(ret)
 
 
 def start(request):
     print('==============start==================')
-    gdbmiId = request.session.get('id', -1)
     ret = {}
-    if gdbmiId == -1:
+    pid = request.session.get('pid', -1)    # 先从session中拿到pid
+    if pid == -1:
         ret['code'] = 1
-        ret['message'] = 'no gdbmi in session'
+        ret['message'] = 'no pid in session'
     else:
-        gdbmi = gdbmis[gdbmiId]
-        try:
-            ret['message'] = gdbmi.write('start')
-            ret['code'] = 0
-        except NoGdbProcessError:
+        gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
+        if gdbmi == -1:
             ret['code'] = 1
-            ret['message'] = 'no gdb process'
-    return JsonResponse(ret)
+            ret['message'] = 'no gdbmi of this pid in gdbmis'
+        else:
+            try:
+                ret['message'] = gdbmi.write('start')
+                ret['code'] = 0
+            except NoGdbProcessError:
+                ret['code'] = 1
+                ret['message'] = 'no gdb process'
+
+    print('ret------------> '+str(ret))
+    return JsonResponse(ret)                # 返回json化数据
 
 
 def continu(request):
     print('==============continu==================')
-    gdbmiId = request.session.get('id', -1)
     ret = {}
-    if gdbmiId == -1:
+    pid = request.session.get('pid', -1)    # 先从session中拿到pid
+    if pid == -1:
         ret['code'] = 1
-        ret['message'] = 'no gdbmi in session'
+        ret['message'] = 'no pid in session'
     else:
-        gdbmi = gdbmis[gdbmiId]
-        try:
-            ret['message'] = gdbmi.write('continue')
-            ret['code'] = 0
-        except NoGdbProcessError:
+        gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
+        if gdbmi == -1:
             ret['code'] = 1
-            ret['message'] = 'no gdb process'
+            ret['message'] = 'no gdbmi of this pid in gdbmis'
+        else:
+            try:
+                ret['message'] = gdbmi.write('continue')
+                ret['code'] = 0
+            except NoGdbProcessError:
+                ret['code'] = 1
+                ret['message'] = 'no gdb process'
+
+    print('ret------------> '+str(ret))
     return JsonResponse(ret)
