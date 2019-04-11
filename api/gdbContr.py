@@ -12,12 +12,12 @@ def uploadelf(request):
     gdbmi = GdbController()                     # 为当前用户实例化GdbController对象
     # if gdbmi == None ???
 
-    gdbmis[request.session['pid']] = gdbmi          # 当前用户的gdbmi的pid作为 gdbmis 的key
+    gdbmis[gdbmi.gdb_process.pid] = gdbmi          # 当前用户的gdbmi的pid作为 gdbmis 的key
     request.session['pid'] = gdbmi.gdb_process.pid  # 将pid放到当前用户的session中
     
     resp = gdbmi.write('file '+fileName)        # 加载调试文件，此时gdb还没有子进程，不需要抛出异常
     ret['code'] = 0
-    ret['message']: resp
+    ret['message'] = resp
 
     print('ret------------> '+str(ret))
     return JsonResponse(ret)
