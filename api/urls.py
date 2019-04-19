@@ -5,4 +5,6 @@ urlpatterns = [
     path('uploadelf', gdbContr.uploadelf),
     path('start', gdbContr.start),
     path('continue', gdbContr.continu),
+    path('disassemble', gdbContr.disass),
+    path('break', gdbContr.brea),
 ]
