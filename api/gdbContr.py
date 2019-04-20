@@ -17,7 +17,10 @@ def uploadelf(request):
     
     resp = gdbmi.write('file '+fileName)        # 加载调试文件，此时gdb还没有子进程，不需要抛出异常
     ret['code'] = 1
-    ret['message'] = resp
+    ret['message'] = []
+    for msg in resp:
+        if msg.type == 'console' or msg.type == 'log':
+            ret['message'].append(msg.payload)
 
     print('ret------------> '+str(ret))
     return JsonResponse(ret)
@@ -29,16 +32,20 @@ def start(request):
     pid = request.session.get('pid', -1)    # 先从session中拿到pid
     if pid == -1:
         ret['code'] = 0
-        ret['message'] = 'no pid in session'
+        ret['message'] = 'please upload elf first.'
     else:
         gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
             ret['code'] = 0
-            ret['message'] = 'no gdbmi of this pid in gdbmis'
+            ret['message'] = 'Error: no gdbmi of this pid in gdbmis'
         else:
             try:
-                ret['message'] = gdbmi.write('start')
+                resp = gdbmi.write('start')
                 ret['code'] = 1
+                ret['message'] = []
+                for msg in resp:
+                    if msg.type == 'console' or msg.type == 'log':
+                        ret['message'].append(msg.payload)
             except NoGdbProcessError:
                 ret['code'] = 0
                 ret['message'] = 'no gdb process'
@@ -48,13 +55,13 @@ def start(request):
 
 
 # continue 继续程序
-def continu(request):
+def continue_gdb(request):
     print('==============continu==================')
     ret = {}
     pid = request.session.get('pid', -1)    # 先从session中拿到pid
     if pid == -1:
         ret['code'] = 0
-        ret['message'] = 'no pid in session'
+        ret['message'] = 'please upload elf first.'
     else:
         gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
@@ -62,18 +69,22 @@ def continu(request):
             ret['message'] = 'no gdbmi of this pid in gdbmis'
         else:
             try:
-                ret['message'] = gdbmi.write('continue')
+                resp = gdbmi.write('continue')
                 ret['code'] = 1
+                ret['message'] = []
+                for msg in resp:
+                    if msg.type == 'console' or msg.type == 'log':
+                        ret['message'].append(msg.payload)
             except NoGdbProcessError:
                 ret['code'] = 0
-                ret['message'] = 'no gdb process'
+                ret['message'] = 'no gdb process. please upload elf first.'
 
     print('ret------------> '+str(ret))
     return JsonResponse(ret)
 
 
 # 返回汇编代码
-def disass(request):
+def disassemble(request):
     print('==============disass==================')
     ret = {}
     fun_name = ''
@@ -83,7 +94,7 @@ def disass(request):
     pid = request.session.get('pid', -1)    # 先从session中拿到pid
     if pid == -1:
         ret['code'] = 0
-        ret['message'] = 'no pid in session'
+        ret['message'] = 'please upload elf first.'
     else:
         gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
@@ -91,18 +102,22 @@ def disass(request):
             ret['message'] = 'no gdbmi of this pid in gdbmis'
         else:
             try:
-                ret['message'] = gdbmi.write('disassemble ' + fun_name)
+                resp = gdbmi.write('disassemble ' + fun_name)
                 ret['code'] = 1
+                ret['message'] = []
+                for msg in resp:
+                    if msg.type == 'console' or msg.type == 'log':
+                        ret['message'].append(msg.payload)
             except NoGdbProcessError:
                 ret['code'] = 0
-                ret['message'] = 'no gdb process'
+                ret['message'] = 'no gdb process. please upload elf first.'
 
     print('ret------------> '+str(ret))
     return JsonResponse(ret)
 
 
 # break下断点
-def brea(request):
+def break_gdb(request):
     print('==============break==================')
     ret = {}
     typ = 0
@@ -114,7 +129,7 @@ def brea(request):
     pid = request.session.get('pid', -1)    # 先从session中拿到pid
     if pid == -1:
         ret['code'] = 0
-        ret['message'] = 'no pid in session'
+        ret['message'] = 'please upload elf first.'
     else:
         gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
@@ -126,11 +141,45 @@ def brea(request):
                 # 如果是对十六进制地址下断点
                 if typ == 2:
                     command = 'break *' + msg
-                ret['message'] = gdbmi.write(command)
+                resp = gdbmi.write(command)
                 ret['code'] = 1
+                ret['message'] = []
+                for msg in resp:
+                    if msg.type == 'console' or msg.type == 'log':
+                        ret['message'].append(msg.payload)
             except NoGdbProcessError:
                 ret['code'] = 0
-                ret['message'] = 'no gdb process'
+                ret['message'] = 'no gdb process. please upload elf first.'
+
+    print('ret------------> '+str(ret))
+    return JsonResponse(ret)
+
+
+# next下一步
+def next_gdb(request):
+    print('==============next==================')
+    ret = {}
+
+    pid = request.session.get('pid', -1)    # 先从session中拿到pid
+    if pid == -1:
+        ret['code'] = 0
+        ret['message'] = 'please upload elf first.'
+    else:
+        gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
+        if gdbmi == -1:
+            ret['code'] = 0
+            ret['message'] = 'no gdbmi of this pid in gdbmis'
+        else:
+            try:
+                resp = gdbmi.write('next')
+                ret['code'] = 1
+                ret['message'] = []
+                for msg in resp:
+                    if msg.type == 'console' or msg.type == 'log':
+                        ret['message'].append(msg.payload)
+            except NoGdbProcessError:
+                ret['code'] = 0
+                ret['message'] = 'no gdb process. please upload elf first.'
 
     print('ret------------> '+str(ret))
     return JsonResponse(ret)
