@@ -19,8 +19,8 @@ def uploadelf(request):
     ret['code'] = 1
     ret['message'] = []
     for msg in resp:
-        if msg.type == 'console' or msg.type == 'log':
-            ret['message'].append(msg.payload)
+        if msg['type'] == 'console' or msg['type'] == 'log':
+            ret['message'].append(msg['payload'])
 
     print('ret------------> '+str(ret))
     return JsonResponse(ret)
@@ -44,8 +44,8 @@ def start(request):
                 ret['code'] = 1
                 ret['message'] = []
                 for msg in resp:
-                    if msg.type == 'console' or msg.type == 'log':
-                        ret['message'].append(msg.payload)
+                    if msg['type'] == 'console' or msg['type'] == 'log':
+                        ret['message'].append(msg['payload'])
             except NoGdbProcessError:
                 ret['code'] = 0
                 ret['message'] = 'no gdb process'
@@ -73,8 +73,8 @@ def continue_gdb(request):
                 ret['code'] = 1
                 ret['message'] = []
                 for msg in resp:
-                    if msg.type == 'console' or msg.type == 'log':
-                        ret['message'].append(msg.payload)
+                    if msg['type'] == 'console' or msg['type'] == 'log':
+                        ret['message'].append(msg['payload'])
             except NoGdbProcessError:
                 ret['code'] = 0
                 ret['message'] = 'no gdb process. please upload elf first.'
@@ -106,8 +106,8 @@ def disassemble(request):
                 ret['code'] = 1
                 ret['message'] = []
                 for msg in resp:
-                    if msg.type == 'console' or msg.type == 'log':
-                        ret['message'].append(msg.payload)
+                    if msg['type'] == 'console' or msg['type'] == 'log':
+                        ret['message'].append(msg['payload'])
             except NoGdbProcessError:
                 ret['code'] = 0
                 ret['message'] = 'no gdb process. please upload elf first.'
@@ -145,8 +145,8 @@ def break_gdb(request):
                 ret['code'] = 1
                 ret['message'] = []
                 for msg in resp:
-                    if msg.type == 'console' or msg.type == 'log':
-                        ret['message'].append(msg.payload)
+                    if msg['type'] == 'console' or msg['type'] == 'log':
+                        ret['message'].append(msg['payload'])
             except NoGdbProcessError:
                 ret['code'] = 0
                 ret['message'] = 'no gdb process. please upload elf first.'
@@ -175,8 +175,8 @@ def next_gdb(request):
                 ret['code'] = 1
                 ret['message'] = []
                 for msg in resp:
-                    if msg.type == 'console' or msg.type == 'log':
-                        ret['message'].append(msg.payload)
+                    if msg['type'] == 'console' or msg['type'] == 'log':
+                        ret['message'].append(msg['payload'])
             except NoGdbProcessError:
                 ret['code'] = 0
                 ret['message'] = 'no gdb process. please upload elf first.'
