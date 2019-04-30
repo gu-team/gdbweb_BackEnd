@@ -133,15 +133,17 @@ SESSION_COOKIE_PATH = '/'    # Session的cookie保存的路径（默认）
 SESSION_COOKIE_DOMAIN = None    # Session的cookie保存的域名（默认）
 SESSION_COOKIE_SECURE = False    # 是否Https传输cookie（默认）
 SESSION_COOKIE_HTTPONLY = True    # 是否Session的cookie只支持http传输（默认）
-SESSION_COOKIE_AGE = 600    # Session的cookie失效日期（2周）（默认）
+SESSION_COOKIE_AGE = 60000    # Session的cookie失效日期（2周）（默认）
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False   # 是否关闭浏览器使得Session过期（默认）
 SESSION_SAVE_EVERY_REQUEST = False   # 是否每次请求都保存Session，默认修改之后才保存（默认）
 
-# 跨域增加忽略
+# 跨域问题
+# 指明在跨域访问中，后端是否支持对cookie的操作
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
-    '*'
+    '127.0.0.1:8080',
+    'localhost:8080', #凡是出现在白名单中的域名，都可以访问后端接口
 )
 CORS_ALLOW_METHODS = (
     'DELETE',
