@@ -30,7 +30,7 @@ def start(request):
     print('==============start==================')
     ret = {}
     pid = request.session.get('pid', -1)    # 先从session中拿到pid
-    print('pid: ' + str(request.session))
+    # print('pid: ' + request.COOKIES['sessionid'])
     if pid == -1:
         ret['code'] = 0
         ret['message'] = 'please upload elf first.'
@@ -91,9 +91,10 @@ def disassemble(request):
     fun_name = ''
     if request.method == 'POST':
         fun_name = request.POST.get('funName')
+        if fun_name is None:
+            fun_name = ''
 
     pid = request.session.get('pid', -1)    # 先从session中拿到pid
-    print('pid: ' + str(request.session))
     if pid == -1:
         ret['code'] = 0
         ret['message'] = 'please upload elf first.'

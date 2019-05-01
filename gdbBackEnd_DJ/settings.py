@@ -143,7 +143,6 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 #凡是出现在白名单中的域名，都可以访问后端接口
 CORS_ORIGIN_WHITELIST = (
-    '127.0.0.1:8080',
     'localhost:8080', 
 )
 CORS_ALLOW_METHODS = (
