@@ -138,12 +138,13 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False   # 是否关闭浏览器使得Session�
 SESSION_SAVE_EVERY_REQUEST = False   # 是否每次请求都保存Session，默认修改之后才保存（默认）
 
 # 跨域问题
-# 指明在跨域访问中，后端是否支持对cookie的操作
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True # 指明在跨域访问中，后端是否支持对cookie的操作
+CORS_ORIGIN_ALLOW_ALL = False
+
+#凡是出现在白名单中的域名，都可以访问后端接口
 CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8080',
-    'localhost:8080', #凡是出现在白名单中的域名，都可以访问后端接口
+    'localhost:8080', 
 )
 CORS_ALLOW_METHODS = (
     'DELETE',
