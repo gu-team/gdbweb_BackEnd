@@ -88,11 +88,9 @@ def continue_gdb(request):
 def disassemble(request):
     print('==============disass==================')
     ret = {}
-    fun_name = ''
-    if request.method == 'POST':
-        fun_name = request.POST.get('funName')
-        if fun_name is None:
-            fun_name = ''
+    fun_name = request.POST.get('funName')
+    if fun_name is None:
+        fun_name = ''
 
     pid = request.session.get('pid', -1)    # 先从session中拿到pid
     if pid == -1:
