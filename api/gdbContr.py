@@ -2,7 +2,6 @@ from django.http import HttpResponse, JsonResponse
 from pygdbmi.gdbcontroller import GdbController, NoGdbProcessError
 
 gdbmis = {}
-
 def uploadelf(request):
     print('============uploadelf================')
     ret = {}
@@ -103,7 +102,7 @@ def disassemble(request):
             ret['message'] = 'no gdbmi of this pid in gdbmis'
         else:
             try:
-                resp = gdbmi.write('disassemble ' + fun_name)
+                resp = gdbmi.write('c ' + fun_name)
                 ret['code'] = 1
                 ret['message'] = []
                 for msg in resp:
@@ -184,3 +183,7 @@ def next_gdb(request):
 
     print('ret------------> '+str(ret))
     return JsonResponse(ret)
+
+def step_gdb(request):
+    print('==============step==================')
+    pid = request.session.get('pid', -1)
