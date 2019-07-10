@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api',
     'corsheaders', # 跨域
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gdbBackEnd_DJ.wsgi.application'
 
+ASGI_APPLICATION = 'routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -143,7 +145,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 #凡是出现在白名单中的域名，都可以访问后端接口
 CORS_ORIGIN_WHITELIST = (
-    'localhost:8080', 
+    'localhost:8080',
 )
 CORS_ALLOW_METHODS = (
     'DELETE',
