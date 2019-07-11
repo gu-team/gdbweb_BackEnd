@@ -7,7 +7,6 @@ class GdbmiManager:
         # key is client id and value is controller
         self.clients = defaultdict(list)
 
-<<<<<<< HEAD
     '''
     @desc:
         client connects to the backend by random client id.
@@ -15,23 +14,15 @@ class GdbmiManager:
     @params:
         client_id: 用户id，由前端生成的唯一标识
     '''
-=======
-    # client connects to the backend by random client id
->>>>>>> e7175a3... use websocket to connect, this is a simple demo
     def connect(self, client_id):
         self.clients[client_id] = []
         return {
             'status': 1,
-<<<<<<< HEAD
             'msg': 'connected successfully',
-=======
-            'msg': 'connected',
->>>>>>> e7175a3... use websocket to connect, this is a simple demo
             'client_id': client_id,
             'gdb_nums': len(self.clients[client_id])
         }
 
-<<<<<<< HEAD
     '''
     @desc:
         连接该用户的某个pid对应的gdb子进程。
@@ -41,8 +32,6 @@ class GdbmiManager:
         client_id: 用户id
         pid: gdb子进程id
     '''
-=======
->>>>>>> e7175a3... use websocket to connect, this is a simple demo
     def connect_to_gdb_subprocess(self, client_id, pid):
         status = 1
         msg = ''
@@ -53,22 +42,15 @@ class GdbmiManager:
             pid = controller.gdb_process.pid
         else:
             controller = self.get_controller(client_id, pid)
-<<<<<<< HEAD
             # get controller by pid. if it is not exist, return error.
             if not controller:
                 status = 0
                 msg = 'no such gdb subprocess with pid {}'.format(pid)
                 print(msg)
-=======
-            if not controller:
-                status = 0
-                msg = 'no such gdb subprocess with pid {}'.format(pid)
->>>>>>> e7175a3... use websocket to connect, this is a simple demo
 
         return {
             'status': status,
             'msg': msg,
-<<<<<<< HEAD
             'pid': pid,
             'gdb_nums': len(self.clients[client_id])
         }
@@ -79,15 +61,6 @@ class GdbmiManager:
     @params:
         client_id: 用户id
     '''
-=======
-            'client_id': client_id,
-            'pid': pid,
-            'gdb_nums': len(self.clients[client_id]),
-            'controller': controller
-        }
-
-    # remove all gdb subprocess when client disconnected
->>>>>>> e7175a3... use websocket to connect, this is a simple demo
     def disconnect(self, client_id):
         for controller in self.clients[client_id]:
             controller.exit()
@@ -100,7 +73,6 @@ class GdbmiManager:
                 return controller
         return None
 
-<<<<<<< HEAD
     '''
     @desc:
         remove GdbController instance by pid
@@ -108,16 +80,12 @@ class GdbmiManager:
         client_id
         pid
     '''
-=======
-    # remove GdbController instance by pid
->>>>>>> e7175a3... use websocket to connect, this is a simple demo
     def remove_controller(self, client_id, pid):
         for controller in self.clients[client_id]:
             if pid == controller.gdb_process.pid:
                 controller.exit()
                 return
 
-<<<<<<< HEAD
     '''
     @desc:
         调用 .write() 执行gdb命令，若异常则返回错误
@@ -146,7 +114,5 @@ class GdbmiManager:
             'data': data
         }
 
-=======
->>>>>>> e7175a3... use websocket to connect, this is a simple demo
 
 manager = GdbmiManager()
