@@ -13,7 +13,10 @@ urlpatterns = [
     path('next', gdbContr.next_gdb),
 ]
 
+<<<<<<< HEAD
 # websocket 路由映射
+=======
+>>>>>>> abdde15... add channels to manager websocket
 websocket_urlpatterns = [
     # url(r'^ws/gdb/(?P<client_id>[^/]+)/$', gdbWsConsumer.Consumer),
     path('ws/gdb/<client_id>', gdbWsConsumer.Consumer)
