@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
-    'corsheaders', # 跨域
-    'channels'
+    'corsheaders',  # 跨域
+    'channels'      # ws
 ]
 
 MIDDLEWARE = [
@@ -74,6 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gdbBackEnd_DJ.wsgi.application'
 
+# WebSocket 配置
 ASGI_APPLICATION = 'routing.application'
 
 # Database
