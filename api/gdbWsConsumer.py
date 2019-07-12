@@ -22,8 +22,8 @@ class Consumer(WebsocketConsumer):
     # WebSocket 数据接受处理
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data) # 处理接受到的数据
-        command_line = text_data_json['command_line']
-        pid = text_data_json['pid']
+        command_line = text_data_json.get('command_line', 'quit')
+        pid = text_data_json.get('pid', -1)
         connect_resp = manager.connect_to_gdb_subprocess(self.client_id, pid) # 连接gdb子进程，若没有则新建，若不存在则返回错误
         status = connect_resp['status']
         # if connect success
