@@ -7,16 +7,31 @@ class GdbmiManager:
         # key is client id and value is controller
         self.clients = defaultdict(list)
 
-    # client connects to the backend by random client id
+    '''
+    @desc:
+        client connects to the backend by random client id.
+        在用户列表中添加该用户。
+    @params:
+        client_id: 用户id，由前端生成的唯一标识
+    '''
     def connect(self, client_id):
         self.clients[client_id] = []
         return {
             'status': 1,
-            'msg': 'connected',
+            'msg': 'connected successfully',
             'client_id': client_id,
             'gdb_nums': len(self.clients[client_id])
         }
 
+    '''
+    @desc:
+        连接该用户的某个pid对应的gdb子进程。
+        若pid为0，则新建gdb子进程。
+        若pid对应子进程不存在，则返回错误信息。
+    @params:
+        client_id: 用户id
+        pid: gdb子进程id
+    '''
     def connect_to_gdb_subprocess(self, client_id, pid):
         status = 1
         msg = ''
@@ -27,20 +42,25 @@ class GdbmiManager:
             pid = controller.gdb_process.pid
         else:
             controller = self.get_controller(client_id, pid)
+            # get controller by pid. if it is not exist, return error.
             if not controller:
                 status = 0
                 msg = 'no such gdb subprocess with pid {}'.format(pid)
+                print(msg)
 
         return {
             'status': status,
             'msg': msg,
-            'client_id': client_id,
             'pid': pid,
-            'gdb_nums': len(self.clients[client_id]),
-            'controller': controller
+            'gdb_nums': len(self.clients[client_id])
         }
 
-    # remove all gdb subprocess when client disconnected
+    '''
+    @desc:
+        remove all gdb subprocess when client disconnected.
+    @params:
+        client_id: 用户id
+    '''
     def disconnect(self, client_id):
         for controller in self.clients[client_id]:
             controller.exit()
@@ -53,12 +73,46 @@ class GdbmiManager:
                 return controller
         return None
 
-    # remove GdbController instance by pid
+    '''
+    @desc:
+        remove GdbController instance by pid
+    @params:
+        client_id
+        pid
+    '''
     def remove_controller(self, client_id, pid):
         for controller in self.clients[client_id]:
             if pid == controller.gdb_process.pid:
                 controller.exit()
                 return
+
+    '''
+    @desc:
+        调用 .write() 执行gdb命令，若异常则返回错误
+    @params:
+        command_line: gdb 的一行命令
+        client_id
+        pid
+    '''
+    def gdb_run_command(self, command_line, client_id, pid):
+        controller = self.get_controller(client_id, pid)
+        status = 1
+        msg = 'run this command successfully'
+        data = []
+        try:
+            resp = controller.write(command_line)
+            for item in resp:
+                if item['type'] == 'console' or item['type'] == 'log':
+                    data.append(item['payload'])
+        except Exception as e:
+            status = 0
+            print('gdb_run_command error: ', e)
+            msg = 'gdbmi write fail'
+        return {
+            'status': status,
+            'msg': msg,
+            'data': data
+        }
 
 
 manager = GdbmiManager()
