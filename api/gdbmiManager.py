@@ -17,7 +17,7 @@ class GdbmiManager:
     def connect(self, client_id):
         self.clients[client_id] = []
         return {
-            'status_code': 1, # 状态码
+            'isSuccess': True, # 是否成功
             'msg': 'connected successfully', # 信息
             'client_id': client_id, # 用户唯一标识
             'gdb_nums': len(self.clients[client_id]) # 用户启用的gdb进程个数
@@ -33,7 +33,7 @@ class GdbmiManager:
         pid: gdb子进程id
     '''
     def connect_to_gdb_subprocess(self, client_id, pid):
-        status_code = 1
+        isSuccess = True
         msg = ''
         # create new controller if pid is less than 0
         if pid <= 0:
@@ -44,12 +44,12 @@ class GdbmiManager:
             controller = self.get_controller(client_id, pid)
             # get controller by pid. if it is not exist, return error.
             if not controller:
-                status_code = 0
+                isSuccess = False
                 msg = 'no such gdb subprocess with pid {}'.format(pid)
                 print(msg)
 
         return {
-            'status_code': status_code, # 状态码，1成功，0失败
+            'isSuccess': isSuccess, # 是否成功
             'msg': msg, # 信息
             'pid': pid, # gdb子进程号
             'gdb_nums': len(self.clients[client_id]) # gdb数量
@@ -96,7 +96,7 @@ class GdbmiManager:
     '''
     def gdb_run_command(self, command_line, client_id, pid):
         controller = self.get_controller(client_id, pid)
-        status_code = 1
+        isSuccess = True
         msg = 'run this command successfully'
         data = []
         try:
@@ -105,11 +105,11 @@ class GdbmiManager:
                 if item['type'] == 'console' or item['type'] == 'log':
                     data.append(item['payload'])
         except Exception as e:
-            status_code = 0
+            isSuccess = False
             print('gdb_run_command error: ', e)
             msg = 'gdbmi write fail'
         return {
-            'status_code': status_code, # 状态码
+            'isSuccess': isSuccess, # 状态码
             'msg': msg, # 信息
             'data': data # 数据
         }

@@ -7,6 +7,11 @@ from api.gdbmiManager import manager
 
 
 class Consumer(WebsocketConsumer):
+    def __init__(self):
+        self.SUCCESS_CODE = 0
+        self.ERROR_CODE = 1 # 错误状态码，通常由于程序自身原因
+        self.FAIL_CODE = 2 # 失败状态码，通常由于请求参数错误
+
     # WebSocket 连接
     def connect(self):
         print('ws connected')
@@ -26,10 +31,12 @@ class Consumer(WebsocketConsumer):
         pid = text_data_json.get('pid', -1) # 对应的gdb进程号
         data_flag = text_data_json.get('data_flag', 'none') # 数据标识，用于前端
 
-        connect_resp = manager.connect_to_gdb_subprocess(self.client_id, pid) # 连接gdb子进程，若没有则新建，若不存在则返回错误
-        status_code = connect_resp['status_code']
+        status_code = self.SUCCESS_CODE
+
+        # 连接gdb子进程，若没有则新建，若不存在则返回错误
+        connect_resp = manager.connect_to_gdb_subprocess(self.client_id, pid)
         # if this pid is exist
-        if status_code:
+        if connect_resp['isSuccess']:
             pid = connect_resp['pid']
             # if upload the elf
             if command_line == 'uploadelf':
@@ -38,10 +45,12 @@ class Consumer(WebsocketConsumer):
             else:
                 run_resp = manager.gdb_run_command(command_line, self.client_id, pid)
             data = run_resp['data']
-            status_code = run_resp['status_code']
             msg = run_resp['msg']
+            if not run_resp['isSuccess']:
+                status_code = self.ERROR_CODE
         else:
             msg = connect_resp['msg']
+            status_code = self.FAIL_CODE
 
         self.send(text_data=json.dumps({
             'status_code': status_code, # 状态码
