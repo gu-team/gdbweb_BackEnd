@@ -15,6 +15,5 @@ urlpatterns = [
 
 # websocket 路由映射
 websocket_urlpatterns = [
-    # url(r'^ws/gdb/(?P<client_id>[^/]+)/$', gdbWsConsumer.Consumer),
     path('ws/gdb/<client_id>', gdbWsConsumer.Consumer)
 ]

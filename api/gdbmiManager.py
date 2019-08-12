@@ -17,10 +17,10 @@ class GdbmiManager:
     def connect(self, client_id):
         self.clients[client_id] = []
         return {
-            'status': 1,
-            'msg': 'connected successfully',
-            'client_id': client_id,
-            'gdb_nums': len(self.clients[client_id])
+            'status_code': 1, # 状态码
+            'msg': 'connected successfully', # 信息
+            'client_id': client_id, # 用户唯一标识
+            'gdb_nums': len(self.clients[client_id]) # 用户启用的gdb进程个数
         }
 
     '''
@@ -33,7 +33,7 @@ class GdbmiManager:
         pid: gdb子进程id
     '''
     def connect_to_gdb_subprocess(self, client_id, pid):
-        status = 1
+        status_code = 1
         msg = ''
         # create new controller if pid is less than 0
         if pid <= 0:
@@ -44,15 +44,15 @@ class GdbmiManager:
             controller = self.get_controller(client_id, pid)
             # get controller by pid. if it is not exist, return error.
             if not controller:
-                status = 0
+                status_code = 0
                 msg = 'no such gdb subprocess with pid {}'.format(pid)
                 print(msg)
 
         return {
-            'status': status,
-            'msg': msg,
-            'pid': pid,
-            'gdb_nums': len(self.clients[client_id])
+            'status_code': status_code, # 状态码，1成功，0失败
+            'msg': msg, # 信息
+            'pid': pid, # gdb子进程号
+            'gdb_nums': len(self.clients[client_id]) # gdb数量
         }
 
     '''
@@ -96,7 +96,7 @@ class GdbmiManager:
     '''
     def gdb_run_command(self, command_line, client_id, pid):
         controller = self.get_controller(client_id, pid)
-        status = 1
+        status_code = 1
         msg = 'run this command successfully'
         data = []
         try:
@@ -105,13 +105,13 @@ class GdbmiManager:
                 if item['type'] == 'console' or item['type'] == 'log':
                     data.append(item['payload'])
         except Exception as e:
-            status = 0
+            status_code = 0
             print('gdb_run_command error: ', e)
             msg = 'gdbmi write fail'
         return {
-            'status': status,
-            'msg': msg,
-            'data': data
+            'status_code': status_code, # 状态码
+            'msg': msg, # 信息
+            'data': data # 数据
         }
 
 
