@@ -17,7 +17,6 @@ class GdbmiManager:
     def connect(self, client_id):
         self.clients[client_id] = []
         return {
-            'isSuccess': True, # 是否成功
             'msg': 'connected successfully', # 信息
             'client_id': client_id, # 用户唯一标识
             'gdb_nums': len(self.clients[client_id]) # 用户启用的gdb进程个数

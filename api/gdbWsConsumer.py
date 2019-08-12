@@ -7,17 +7,17 @@ from api.gdbmiManager import manager
 
 
 class Consumer(WebsocketConsumer):
-    def __init__(self):
-        self.SUCCESS_CODE = 0
-        self.ERROR_CODE = 1 # 错误状态码，通常由于程序自身原因
-        self.FAIL_CODE = 2 # 失败状态码，通常由于请求参数错误
-
     # WebSocket 连接
     def connect(self):
         print('ws connected')
+        self.SUCCESS_CODE = 0
+        self.ERROR_CODE = 1 # 错误状态码，通常由于程序自身原因
+        self.FAIL_CODE = 2 # 失败状态码，通常由于请求参数错误
         self.client_id = self.scope['url_route']['kwargs']['client_id']
         self.accept()
-        self.send(json.dumps(manager.connect(self.client_id)))
+        resp = manager.connect(self.client_id)
+        resp['status_code'] = self.SUCCESS_CODE
+        self.send(json.dumps(resp))
 
     # WebSocket 断开连接
     def disconnect(self, code):
