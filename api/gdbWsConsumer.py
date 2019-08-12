@@ -22,8 +22,10 @@ class Consumer(WebsocketConsumer):
     # WebSocket 数据接受处理
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data) # json化处理接受到的数据
-        command_line = text_data_json.get('command_line', 'quit')
-        pid = text_data_json.get('pid', -1)
+        command_line = text_data_json.get('command_line', 'quit') # 要发送的命令行参数
+        pid = text_data_json.get('pid', -1) # 对应的gdb进程号
+        data_flag = text_data_json.get('data_flag', 'none') # 数据标识，用于前端
+
         connect_resp = manager.connect_to_gdb_subprocess(self.client_id, pid) # 连接gdb子进程，若没有则新建，若不存在则返回错误
         status_code = connect_resp['status_code']
         # if this pid is exist
@@ -41,8 +43,6 @@ class Consumer(WebsocketConsumer):
         else:
             msg = connect_resp['msg']
 
-        data_flag = command_line.split(' ')[0]
-        print(data_flag)
         self.send(text_data=json.dumps({
             'status_code': status_code, # 状态码
             'msg': msg, # 信息
