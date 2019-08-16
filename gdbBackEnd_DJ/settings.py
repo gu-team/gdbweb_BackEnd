@@ -39,14 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
-    'corsheaders',  # 跨域
+    # 'corsheaders',  # 跨域
     'channels'      # ws
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware', # 跨域
+    # 'corsheaders.middleware.CorsMiddleware', # 跨域
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -59,7 +59,7 @@ ROOT_URLCONF = 'gdbBackEnd_DJ.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [], # [os.path.join(BASE_DIR,'dist')], # 配置template页面目录
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,7 +75,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gdbBackEnd_DJ.wsgi.application'
 
 # WebSocket 配置
-ASGI_APPLICATION = 'routing.application'
+ASGI_APPLICATION = 'gdbBackEnd_DJ.urls.wsUrl'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -115,11 +115,8 @@ LANGUAGE_CODE = 'zh-hans'
 
 # 把国际时区改为中国时区
 TIME_ZONE = 'Asia/Shanghai'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -127,6 +124,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "dist"),
+# ]
 
 # Django默认支持Session，并且默认是将Session数据存储在数据库中，即：django_session 表中。
 
@@ -141,31 +142,31 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False   # 是否关闭浏览器使得Session�
 SESSION_SAVE_EVERY_REQUEST = False   # 是否每次请求都保存Session，默认修改之后才保存（默认）
 
 # 跨域问题
-CORS_ALLOW_CREDENTIALS = True # 指明在跨域访问中，后端是否支持对cookie的操作
-CORS_ORIGIN_ALLOW_ALL = False
+# CORS_ALLOW_CREDENTIALS = True # 指明在跨域访问中，后端是否支持对cookie的操作
+# CORS_ORIGIN_ALLOW_ALL = False
 
-#凡是出现在白名单中的域名，都可以访问后端接口
-CORS_ORIGIN_WHITELIST = (
-    'localhost:8080',
-)
-CORS_ALLOW_METHODS = (
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-    'VIEW',
-)
-CORS_ALLOW_HEADERS = (
-    'XMLHttpRequest',
-    'X_FILENAME',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-)
+# 凡是出现在白名单中的域名，都可以访问后端接口
+# CORS_ORIGIN_WHITELIST = (
+#     'localhost:8080',
+# )
+# CORS_ALLOW_METHODS = (
+#     'DELETE',
+#     'GET',
+#     'OPTIONS',
+#     'PATCH',
+#     'POST',
+#     'PUT',
+#     'VIEW',
+# )
+# CORS_ALLOW_HEADERS = (
+#     'XMLHttpRequest',
+#     'X_FILENAME',
+#     'accept-encoding',
+#     'authorization',
+#     'content-type',
+#     'dnt',
+#     'origin',
+#     'user-agent',
+#     'x-csrftoken',
+#     'x-requested-with',
+# )

@@ -15,8 +15,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),  # 转到 api.urls
+    # path(r'^.*?$', views.index, name="index"), # 结合前端Vue生成的dist/
 ]
+
+'''
+WebSocket配置。将路由定义与 api.urls.websocket_urlpatterns 关联
+'''
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+
+import api
+
+wsUrl = ProtocolTypeRouter({
+    # Empty for now (http->django views is added by default)
+    'websocket': AuthMiddlewareStack(
+        URLRouter(
+            api.urls.websocket_urlpatterns
+        )   
+    ),  
+})
