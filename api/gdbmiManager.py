@@ -100,6 +100,7 @@ class GdbmiManager:
         data = []
         try:
             resp = controller.write(command_line)
+            print('\nresp--->', resp)
             for item in resp:
                 if item['type'] == 'console' or item['type'] == 'log':
                     data.append(item['payload'])

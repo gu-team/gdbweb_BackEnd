@@ -30,6 +30,7 @@ class Consumer(WebsocketConsumer):
         command_line = text_data_json.get('command_line', 'quit') # 要发送的命令行参数
         pid = text_data_json.get('pid', -1) # 对应的gdb进程号
         data_flag = text_data_json.get('data_flag', 'none') # 数据标识，用于前端
+        print('\n', command_line, pid, data_flag)
 
         status_code = self.SUCCESS_CODE
 
