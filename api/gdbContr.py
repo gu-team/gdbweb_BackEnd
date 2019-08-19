@@ -1,40 +1,60 @@
+import os
+import random
+import string
+
 from django.http import HttpResponse, JsonResponse
 from pygdbmi.gdbcontroller import GdbController, NoGdbProcessError
 
 gdbmis = {}
+
+
 def uploadelf(request):
-    print('============uploadelf================')
-    ret = {}
-    fileName = request.GET.get('fileName')      # 从请求获取文件名参数
-    if not fileName:
-        fileName = 'demo'
-    gdbmi = GdbController()                     # 为当前用户实例化GdbController对象
-    # if gdbmi == None ???
+    if request.method != 'POST':
+        return JsonResponse({'status': 0, 'message': 'method not allowed'}, status=405)
+    file = request.FILES.get('file', None)
+    if not file:
+        return JsonResponse({'status': 0, 'message': 'file not found'})
+    filename = ''.join(random.sample(string.ascii_letters + string.digits, 8))
+    with open(os.path.join(os.getcwd(), 'upload', filename),
+              'wb') as f:
+        for chunk in file.chunks():
+            f.write(chunk)
+    return JsonResponse({'status': 1, 'filename': filename})
 
-    gdbmis[gdbmi.gdb_process.pid] = gdbmi          # 当前用户的gdbmi的pid作为 gdbmis 的key
-    request.session['pid'] = gdbmi.gdb_process.pid  # 将pid放到当前用户的session中
-    
-    resp = gdbmi.write('file '+fileName)        # 加载调试文件，此时gdb还没有子进程，不需要抛出异常
-    ret['code'] = 1
-    ret['message'] = []
-    for msg in resp:
-        if msg['type'] == 'console' or msg['type'] == 'log':
-            ret['message'].append(msg['payload'])
 
-    print('ret------------> '+str(ret))
-    return JsonResponse(ret)
+# def uploadelf(request):
+#     print('============uploadelf================')
+#     ret = {}
+#     fileName = request.GET.get('fileName')      # 从请求获取文件名参数
+#     if not fileName:
+#         fileName = 'demo'
+#     gdbmi = GdbController()                     # 为当前用户实例化GdbController对象
+#     # if gdbmi == None ???
+#
+#     gdbmis[gdbmi.gdb_process.pid] = gdbmi          # 当前用户的gdbmi的pid作为 gdbmis 的key
+#     request.session['pid'] = gdbmi.gdb_process.pid  # 将pid放到当前用户的session中
+#
+#     resp = gdbmi.write('file '+fileName)        # 加载调试文件，此时gdb还没有子进程，不需要抛出异常
+#     ret['code'] = 1
+#     ret['message'] = []
+#     for msg in resp:
+#         if msg['type'] == 'console' or msg['type'] == 'log':
+#             ret['message'].append(msg['payload'])
+#
+#     print('ret------------> '+str(ret))
+#     return JsonResponse(ret)
 
 
 def start(request):
     print('==============start==================')
     ret = {}
-    pid = request.session.get('pid', -1)    # 先从session中拿到pid
+    pid = request.session.get('pid', -1)  # 先从session中拿到pid
     # print('pid: ' + request.COOKIES['sessionid'])
     if pid == -1:
         ret['code'] = 0
         ret['message'] = 'please upload elf first.'
     else:
-        gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
+        gdbmi = gdbmis.get(pid, -1)  # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
             ret['code'] = 0
             ret['message'] = 'Error: no gdbmi of this pid in gdbmis'
@@ -50,20 +70,20 @@ def start(request):
                 ret['code'] = 0
                 ret['message'] = 'no gdb process'
 
-    print('ret------------> '+str(ret))
-    return JsonResponse(ret)                # 返回json化数据
+    print('ret------------> ' + str(ret))
+    return JsonResponse(ret)  # 返回json化数据
 
 
 # continue 继续程序
 def continue_gdb(request):
     print('==============continu==================')
     ret = {}
-    pid = request.session.get('pid', -1)    # 先从session中拿到pid
+    pid = request.session.get('pid', -1)  # 先从session中拿到pid
     if pid == -1:
         ret['code'] = 0
         ret['message'] = 'please upload elf first.'
     else:
-        gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
+        gdbmi = gdbmis.get(pid, -1)  # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
             ret['code'] = 0
             ret['message'] = 'no gdbmi of this pid in gdbmis'
@@ -79,7 +99,7 @@ def continue_gdb(request):
                 ret['code'] = 0
                 ret['message'] = 'no gdb process. please upload elf first.'
 
-    print('ret------------> '+str(ret))
+    print('ret------------> ' + str(ret))
     return JsonResponse(ret)
 
 
@@ -91,12 +111,12 @@ def disassemble(request):
     if fun_name is None:
         fun_name = ''
 
-    pid = request.session.get('pid', -1)    # 先从session中拿到pid
+    pid = request.session.get('pid', -1)  # 先从session中拿到pid
     if pid == -1:
         ret['code'] = 0
         ret['message'] = 'please upload elf first.'
     else:
-        gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
+        gdbmi = gdbmis.get(pid, -1)  # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
             ret['code'] = 0
             ret['message'] = 'no gdbmi of this pid in gdbmis'
@@ -112,7 +132,7 @@ def disassemble(request):
                 ret['code'] = 0
                 ret['message'] = 'no gdb process. please upload elf first.'
 
-    print('ret------------> '+str(ret))
+    print('ret------------> ' + str(ret))
     return JsonResponse(ret)
 
 
@@ -126,12 +146,12 @@ def break_gdb(request):
         typ = request.POST.get('type')
         msg = request.POST.get('message')
 
-    pid = request.session.get('pid', -1)    # 先从session中拿到pid
+    pid = request.session.get('pid', -1)  # 先从session中拿到pid
     if pid == -1:
         ret['code'] = 0
         ret['message'] = 'please upload elf first.'
     else:
-        gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
+        gdbmi = gdbmis.get(pid, -1)  # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
             ret['code'] = 0
             ret['message'] = 'no gdbmi of this pid in gdbmis'
@@ -151,7 +171,7 @@ def break_gdb(request):
                 ret['code'] = 0
                 ret['message'] = 'no gdb process. please upload elf first.'
 
-    print('ret------------> '+str(ret))
+    print('ret------------> ' + str(ret))
     return JsonResponse(ret)
 
 
@@ -160,12 +180,12 @@ def next_gdb(request):
     print('==============next==================')
     ret = {}
 
-    pid = request.session.get('pid', -1)    # 先从session中拿到pid
+    pid = request.session.get('pid', -1)  # 先从session中拿到pid
     if pid == -1:
         ret['code'] = 0
         ret['message'] = 'please upload elf first.'
     else:
-        gdbmi = gdbmis.get(pid, -1)         # 用pid到gdbmis中拿到当前用户的gdbmi
+        gdbmi = gdbmis.get(pid, -1)  # 用pid到gdbmis中拿到当前用户的gdbmi
         if gdbmi == -1:
             ret['code'] = 0
             ret['message'] = 'no gdbmi of this pid in gdbmis'
@@ -181,8 +201,9 @@ def next_gdb(request):
                 ret['code'] = 0
                 ret['message'] = 'no gdb process. please upload elf first.'
 
-    print('ret------------> '+str(ret))
+    print('ret------------> ' + str(ret))
     return JsonResponse(ret)
+
 
 def step_gdb(request):
     print('==============step==================')
