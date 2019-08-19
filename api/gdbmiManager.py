@@ -1,6 +1,14 @@
 from collections import defaultdict
 from pygdbmi.gdbcontroller import GdbController
+import os, sys
 
+# 删除gdb子进程所产生的文件
+def clear_files(pid):
+    dirPath = '../'
+    if os.path.exists(dirPath + pid + "_input.txt"):
+        os.remove(dirPath + pid + "_input.txt")
+    if os.path.exists(dirPath + pid + "_ouput.txt"):
+        os.remove(dirPath + pid + "_ouput.txt")
 
 class GdbmiManager:
     def __init__(self):
@@ -63,6 +71,7 @@ class GdbmiManager:
     def disconnect(self, client_id):
         for controller in self.clients[client_id]:
             controller.exit()
+            clear_files(controller.gdb_process.pid)
         self.clients.pop(client_id)
 
     # get GdbController instance by pid

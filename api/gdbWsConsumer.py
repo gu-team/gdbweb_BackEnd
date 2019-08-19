@@ -29,26 +29,43 @@ class Consumer(WebsocketConsumer):
         text_data_json = json.loads(text_data) # json化处理接受到的数据
         command_line = text_data_json.get('command_line', 'quit') # 要发送的命令行参数
         pid = text_data_json.get('pid', -1) # 对应的gdb进程号
-        data_flag = text_data_json.get('data_flag', 'none') # 数据标识，用于前端
+        data_flag = text_data_json.get('data_flag', 'none') # 数据标识，原封不动传回前端，用于前端识别不同数据
+        input_data = text_data_json.get('input_data', '') # 输入到程序的数据
         print('\n', command_line, pid, data_flag)
 
         status_code = self.SUCCESS_CODE
 
         # 连接gdb子进程，若没有则新建，若不存在则返回错误
         connect_resp = manager.connect_to_gdb_subprocess(self.client_id, pid)
-        # if this pid is exist
+        # 如果连接gdb子进程成功
         if connect_resp['isSuccess']:
             pid = connect_resp['pid']
-            # if upload the elf
-            if command_line == 'uploadelf':
+            # 如果是上传文件
+            if command_line == 'upload elf':
                 # TODO
-                run_resp = manager.gdb_run_command('file demo', self.client_id, pid)
+                pass
+            # 如果是确定程序输入
+            elif command_line == 'set input':
+                with open(pid + '_input.txt', 'w') as file:
+                    file.write(input_data)
+                    msg = 'set input successfully'
+            # 如果是获取程序输出
+            elif command_line == 'get ouput':
+                with open(pid + '_ouput.txt', 'r') as file:
+                    data = file.read()
+                    msg = 'get output successfully'
+
+            # 如果是gdb命令
             else:
+                if command_line == 'start' or command_line == 'next':
+                    command_line += ' < ' + pid + '_input.txt > ' + pid + '_output.txt'
                 run_resp = manager.gdb_run_command(command_line, self.client_id, pid)
-            data = run_resp['data']
-            msg = run_resp['msg']
-            if not run_resp['isSuccess']:
-                status_code = self.ERROR_CODE
+                data = run_resp['data']
+                msg = run_resp['msg']
+                if not run_resp['isSuccess']:
+                    status_code = self.ERROR_CODE
+
+        # 如果连接gdb子进程失败
         else:
             msg = connect_resp['msg']
             status_code = self.FAIL_CODE

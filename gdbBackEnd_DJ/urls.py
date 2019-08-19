@@ -36,6 +36,6 @@ wsUrl = ProtocolTypeRouter({
     'websocket': AuthMiddlewareStack(
         URLRouter(
             api.urls.websocket_urlpatterns
-        )   
-    ),  
+        )
+    ),
 })
