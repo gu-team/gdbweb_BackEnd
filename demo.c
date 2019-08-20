@@ -18,7 +18,8 @@ int main() {
                 printf("what is gdb? %d\n", i);
         }
 
-        int a = 1, b=3;
+        int a, b;
+        scanf("%d%d", &a, &b);
         printf("%d\n", fun(a, b));
 
         return 0;
