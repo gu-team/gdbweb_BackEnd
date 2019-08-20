@@ -45,17 +45,14 @@ class Consumer(WebsocketConsumer):
             if command_line == 'start' or command_line == 'next':
                 command_line += ' < ' + pid + '_input.txt > ' + pid + '_output.txt'
             if command_line == 'file':
-                print(os.path.join(os.getcwd(), 'upload', file_name))
-                run_resp = manager.gdb_run_command(
-                    'file ' + os.path.join(os.getcwd(), 'upload', file_name),
-                    self.client_id,
-                    pid)
+                file_path = os.path.join(os.getcwd(), 'upload', file_name)
+                print(file_path)
+                command_line += 'file ' + file_path
             run_resp = manager.gdb_run_command(command_line, self.client_id, pid)
             data = run_resp['data']
             msg = run_resp['msg']
             if not run_resp['isSuccess']:
                 status_code = self.ERROR_CODE
-
         # 如果连接gdb子进程失败
         else:
             msg = connect_resp['msg']
