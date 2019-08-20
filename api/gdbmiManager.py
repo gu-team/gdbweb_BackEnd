@@ -66,10 +66,10 @@ class GdbmiManager:
         for controller in self.clients[client_id]['gdbs']:
             pid = controller.gdb_process.pid
             controller.exit()
-            input_file = os.path.join(os.getcwd(), 'upload', pid + '_input.txt')
+            input_file = os.path.join(os.getcwd(), 'upload', str(pid) + '_input.txt')
             if os.path.exists(input_file):
                 os.remove(input_file)
-            output_file = os.path.join(os.getcwd(), 'upload', pid + '_output.txt')
+            output_file = os.path.join(os.getcwd(), 'upload', str(pid) + '_output.txt')
             if os.path.exists(output_file):
                 os.remove(output_file)
         for file_name in self.clients[client_id]['elfs']:

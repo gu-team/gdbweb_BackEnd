@@ -33,7 +33,7 @@ class Consumer(WebsocketConsumer):
         pid = text_data_json.get('pid', -1) # 对应的gdb进程号
         data_flag = text_data_json.get('data_flag', 'none') # 数据标识，原封不动传回前端，用于前端识别不同数据
         file_name = text_data_json.get('file_name', '') # 输入上传程序名
-        print('receive ---> ', command_line, pid, data_flag, file_name)
+        print('\nws receive ---> ', command_line, pid, data_flag, file_name)
 
         status_code = self.SUCCESS_CODE
 
@@ -42,12 +42,14 @@ class Consumer(WebsocketConsumer):
         # 如果连接gdb子进程成功
         if connect_resp['isSuccess']:
             pid = connect_resp['pid']
-            if command_line == 'start' or command_line == 'next':
-                command_line += ' < ' + pid + '_input.txt > ' + pid + '_output.txt'
+            if command_line == 'start' or command_line == 'run':
+                input_file = os.path.join(os.getcwd(), 'upload', str(pid) + '_input.txt')
+                output_file = os.path.join(os.getcwd(), 'upload', str(pid) + '_output.txt')
+                command_line += ' < ' + input_file + ' > ' + output_file
             if command_line == 'file':
                 file_path = os.path.join(os.getcwd(), 'upload', file_name)
                 print(file_path)
-                command_line += 'file ' + file_path
+                command_line += ' ' + file_path
             run_resp = manager.gdb_run_command(command_line, self.client_id, pid)
             data = run_resp['data']
             msg = run_resp['msg']
