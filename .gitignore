@@ -1,5 +1,6 @@
 .vscode
 nohup.out
+upload/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

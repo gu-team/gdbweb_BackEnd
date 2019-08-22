@@ -2,19 +2,15 @@ from django.conf.urls import url
 from django.urls import path, include
 
 from api import gdbWsConsumer
-from . import gdbContr
+from . import controller
 
 urlpatterns = [
-    path('uploadelf', gdbContr.uploadelf),
-    path('start', gdbContr.start),
-    path('continue', gdbContr.continue_gdb),
-    path('disassemble', gdbContr.disassemble),
-    path('break', gdbContr.break_gdb),
-    path('next', gdbContr.next_gdb),
+    path('uploadElf', controller.upload_elf),
+    path('setInput', controller.set_input),
+    path('getOutput', controller.get_ouput),
 ]
 
 # websocket 路由映射
 websocket_urlpatterns = [
-    # url(r'^ws/gdb/(?P<client_id>[^/]+)/$', gdbWsConsumer.Consumer),
     path('ws/gdb/<client_id>', gdbWsConsumer.Consumer)
 ]
