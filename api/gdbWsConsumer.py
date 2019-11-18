@@ -32,7 +32,7 @@ class Consumer(WebsocketConsumer):
         command_line = text_data_json.get('command_line', 'quit') # 要发送的命令行参数
         pid = text_data_json.get('pid', -1) # 对应的gdb进程号
         data_flag = text_data_json.get('data_flag', 'none') # 数据标识，原封不动传回前端，用于前端识别不同数据
-        file_name = text_data_json.get('file_name', '') # 输入上传程序名
+        file_name = text_data_json.get('file_name', '') # 输入上传程序的文件名
         print('\nws receive ---> ', command_line, pid, data_flag, file_name)
 
         status_code = self.SUCCESS_CODE
@@ -46,7 +46,7 @@ class Consumer(WebsocketConsumer):
                 input_file = os.path.join(os.getcwd(), 'upload', str(pid) + '_input.txt')
                 output_file = os.path.join(os.getcwd(), 'upload', str(pid) + '_output.txt')
                 command_line += ' < ' + input_file + ' > ' + output_file
-            if command_line == 'file':
+            elif command_line == 'file':
                 file_path = os.path.join(os.getcwd(), 'upload', file_name)
                 print(file_path)
                 command_line += ' ' + file_path
